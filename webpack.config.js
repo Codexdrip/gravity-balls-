@@ -1,12 +1,12 @@
-const BrowserSyncPlugin = require('browser-sync-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const BrowserSyncPlugin = require("browser-sync-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  mode: 'development',
-  entry: './src/js/canvas.js',
+  mode: "development",
+  entry: { page1: "./src/js/canvas.js", page2: "./src/js/data.js" },
   output: {
-    path: __dirname + '/dist/',
-    filename: './js/canvas.bundle.js'
+    path: __dirname + "/dist/",
+    filename: "./js/[name].bundle.js"
   },
   module: {
     rules: [
@@ -14,9 +14,9 @@ module.exports = {
         test: /\.js$/,
         exclude: /(node_modules|bower_components)/,
         use: {
-          loader: 'babel-loader',
+          loader: "babel-loader",
           options: {
-            presets: ['env']
+            presets: ["env"]
           }
         }
       }
@@ -24,18 +24,18 @@ module.exports = {
   },
   plugins: [
     new BrowserSyncPlugin({
-      host: 'localhost',
+      host: "localhost",
       port: 3000,
-      server: { baseDir: ['dist'] },
-      files: ['./dist/*'],
+      server: { baseDir: ["dist"] },
+      files: ["./dist/*"],
       notify: false
     }),
     new HtmlWebpackPlugin({
-      filename: 'index.html',
-      favicon: 'favicon.ico',
-      template: 'src/index.html'
+      filename: "index.html",
+      favicon: "favicon.ico",
+      template: "src/index.html"
     })
   ],
   watch: true,
-  devtool: 'source-map'
-}
+  devtool: "source-map"
+};

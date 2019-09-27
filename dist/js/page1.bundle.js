@@ -102,71 +102,148 @@ var _utils2 = _interopRequireDefault(_utils);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var canvas = document.querySelector('canvas');
-var c = canvas.getContext('2d');
+var canvas = document.querySelector("canvas");
+var c = canvas.getContext("2d");
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
 var mouse = {
-    x: innerWidth / 2,
-    y: innerHeight / 2
+  x: innerWidth / 2,
+  y: innerHeight / 2,
+  click: false
 };
 
-var colors = ['#2185C5', '#7ECEFD', '#FFF6E5', '#FF7F66'];
+var colors = ["#BF0413", "orange", "#730202", "#D9D9D9"];
 
 // Event Listeners
-addEventListener('mousemove', function (event) {
-    mouse.x = event.clientX;
-    mouse.y = event.clientY;
+addEventListener("mousemove", function (event) {
+  mouse.x = event.clientX;
+  mouse.y = event.clientY;
 });
 
-addEventListener('resize', function () {
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-
-    init();
+addEventListener("mousedown", function (event) {
+  mouse.x = event.clientX;
+  mouse.y = event.clientY;
+  mouse.click = "down";
 });
+addEventListener("mouseup", function (event) {
+  mouse.x = event.clientX;
+  mouse.y = event.clientY;
+  mouse.click = "up";
+});
+
+addEventListener("resize", function () {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+
+  init();
+});
+
+var gravity = 1;
+var friction = 0.95;
 
 // Objects
-function Object(x, y, radius, color) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.color = color;
-}
+function Ball(y, radius, color) {
+  this.radius = Math.random() * 20;
+  this.x = Math.random() * canvas.width - this.radius;
+  this.y = Math.random() * canvas.height - this.radius;
+  this.dx = (Math.random() - 0.5) * 3;
+  this.dy = (Math.random() - 0.5) * 3;
+  this.color = colors[Math.floor(Math.random() * colors.length)];
 
-Object.prototype.draw = function () {
+  this.draw = function () {
     c.beginPath();
     c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
     c.fillStyle = this.color;
     c.fill();
+    c.stroke();
     c.closePath();
-};
+  };
 
-Object.prototype.update = function () {
+  this.checkForWall = function () {
+    if (this.y > canvas.height - this.radius + 2) {
+      this.dy = -this.dy * friction;
+    } else {
+      this.dy += gravity;
+    }
+    if (this.y < this.radius) {
+      this.dy = -this.dy;
+    }
+    if (this.x > canvas.width - this.radius || this.x < this.radius) {
+      this.dx = -this.dx * friction;
+    }
+  };
+  this.checkMouseClick = function () {
+    if (mouse.click === "down") {
+      gravity = 1;
+      if (this.x !== mouse.x) {
+        if (this.x < mouse.x) {
+          if (this.x !== mouse.x) {
+            this.x += 12;
+            this.dx = 2;
+          }
+        }
+        if (this.x > mouse.x) {
+          if (this.x !== mouse.x) {
+            this.x -= 12;
+            this.dx = 2;
+          }
+        }
+      }
+      if (this.y !== mouse.y) {
+        if (this.y > mouse.y) {
+          if (this.y !== mouse.y) {
+            this.y -= 12;
+            this.dy = 2;
+          }
+        }
+        if (this.y < mouse.y) {
+          if (this.y !== mouse.y) {
+            this.y += 12;
+            this.dy = 2;
+          }
+        }
+      }
+    } else if (mouse.click === "up") {
+      gravity = 0;
+      this.dy = (Math.random() - 0.5) * 50;
+      this.dx = (Math.random() - 0.5) * 50;
+      if (this.y - mouse.y > 50) {
+        gravity = 1;
+        mouse.click = undefined;
+      }
+    }
+  };
+
+  this.update = function () {
     this.draw();
-};
+    this.checkMouseClick();
+    this.checkForWall();
+
+    this.x += this.dx;
+    this.y += this.dy;
+  };
+}
 
 // Implementation
-var objects = void 0;
-function init() {
-    objects = [];
 
-    for (var i = 0; i < 400; i++) {
-        // objects.push()
-    }
+var ballArr = [];
+
+function init() {
+  ballArr = [];
+  for (var i = 0; i < 200; i++) {
+    ballArr.push(new Ball());
+  }
 }
 
 // Animation Loop
 function animate() {
-    requestAnimationFrame(animate);
-    c.clearRect(0, 0, canvas.width, canvas.height);
-
-    c.fillText('HTML CANVAS BOILERPLATE', mouse.x, mouse.y);
-    // objects.forEach(object => {
-    //  object.update()
-    // })
+  requestAnimationFrame(animate);
+  c.clearRect(0, 0, canvas.width, canvas.height);
+  ballArr.map(function (item) {
+    item.update();
+  });
 }
 
 init();
@@ -204,4 +281,4 @@ module.exports = { randomIntFromRange: randomIntFromRange, randomColor: randomCo
 /***/ })
 
 /******/ });
-//# sourceMappingURL=canvas.bundle.js.map
+//# sourceMappingURL=page1.bundle.js.map
